@@ -1,0 +1,34 @@
+site_name: databricks-llm-fine-tuning-demo
+docs_dir: . # this, in combination with plugin '- same-dir', makes root folder as reference folder
+
+# Copyright
+copyright: Copyright &copy; 2004 - 2024 Northell Partners Ltd
+site_author: Peter Verster
+
+
+nav:
+  - Home: 'README.md'
+  - Code Reference:
+      - Benchmarks: 'docs/code_documentation.md' 
+                     
+
+theme:
+  name: "material"
+  font:
+    text: Roboto
+    code: Roboto Mono
+
+plugins:
+  - search        # to have search functionality in the document
+  - mkdocstrings:  # To generate documentation from the code docstrings
+      default_handler: python
+      handlers:
+        python:
+          options:
+            show_source: false  
+  - with-pdf:
+      cover_subtitle: Architecture Design Specification (ADS)
+      output_path: pdf/databricks_llm_fine_tuning_demo_ads.pdf      
+
+  - same-dir      # this makes documentation consider root folder as reference https://github.com/oprypin/mkdocs-same-dir/blob/master/README.md
+  - print-site    # this should be at the bottom of the plugin list!

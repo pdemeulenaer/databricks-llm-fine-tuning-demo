@@ -1,0 +1,151 @@
+variables:
+  majorVersion: 1
+  minorVersion: 0
+  featureName: 'databricks-llm-fine-tuning-demo'
+  outputFolder: 'databricks-llm-fine-tuning-demo'
+  addBuildNumberToArtifactZip: true
+  condaEnvName: 'databricks-llm-fine-tuning-demo'
+
+name: $(majorVersion).$(minorVersion)$(Rev:.r)
+
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - src/*
+      - 'azure-pipelines*'
+      - databricks.yml
+      - resources/*.yml  
+      - requirements* 
+      - setup.py  
+
+
+stages:
+  - stage: CI
+    displayName: Build 
+    variables:
+      - group: databricks-dev
+    jobs:
+      - job: Build
+        displayName: 'Build'
+        pool:
+          vmImage: ubuntu-latest # $(vmPoolImage)        
+        steps:
+
+        - checkout: self
+          persistCredentials: true
+          clean: true
+          displayName: 'Checkout & Build.Reason: $(Build.Reason) & Build.SourceBranchName: $(Build.SourceBranchName)'
+
+        - task: UsePythonVersion@0
+          displayName: 'Use Python 3.10'
+          inputs:
+            versionSpec: 3.10
+
+        - bash: echo "##vso[task.prependpath]$CONDA/bin"
+          displayName: Add conda to PATH
+
+        - script: |
+            echo $(Build.BuildNumber) > build_version.txt
+          displayName: Create build version txt
+
+        - script: |
+            conda init bash
+
+        - script: |
+            conda env create --file environment.yml
+            source /usr/share/miniconda/etc/profile.d/conda.sh
+            conda activate $(condaEnvName)
+            python -m pip install --upgrade pip
+            pip install -r requirements.txt
+            pip install -e .
+            # make quality-ci
+            # mypy .
+            # pylint src/language_model_training
+          displayName: 'Install dependencies & check quality'
+
+        # - script: |
+        #     pip install wheel
+        #     pip install twine
+        #   displayName: Install wheel + twine
+
+        # - script: |
+        #     python setup-ci.py bdist_wheel
+        #   displayName: Create wheel file
+
+        # - task: TwineAuthenticate@1
+        #   displayName: 'Twine Authenticate'
+        #   inputs:
+        #     artifactFeed: 'northell'
+
+        # - script: python -m twine upload -r northell --config-file $(PYPIRC_PATH) dist/*.whl
+        #   displayName: Push wheel file to artifacts feed
+
+        # Install Databricks CLI (not in venv)
+        - script: |        
+            curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh   
+            databricks version
+          displayName: 'Install Databricks CLI and get its version'                 
+
+        # Validate bundle to be deployed to the staging workspace
+        - script: |       
+            make validate-bundle
+          displayName: Validate bundle    
+
+
+  - stage: CD_dev
+    displayName: Deployment to Dev in the Databricks central workspace 
+    variables:
+      - group: databricks-dev
+    jobs:
+      - job: deployBundle
+        displayName: 'Deploy bundle to Dev'
+        pool:
+          vmImage: ubuntu-latest # $(vmPoolImage)        
+        steps:
+
+        - checkout: self
+          persistCredentials: true
+          clean: true
+          displayName: 'Checkout & Build.Reason: $(Build.Reason) & Build.SourceBranchName: $(Build.SourceBranchName)'  
+
+        # Install Databricks CLI (not in venv)
+        - script: |
+            curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh   
+            databricks version
+          displayName: 'Install Databricks CLI and get its version'                           
+            
+        # Deploy bundle to dev
+        - script: |       
+            databricks bundle deploy -t dev
+          displayName: Deploy bundle to test deployment target in dev          
+
+
+  - stage: CD_staging
+    displayName: Deployment to Staging in the Databricks central workspace 
+    variables:
+      - group: databricks-staging
+    jobs:
+      - job: deployBundle
+        displayName: 'Deploy bundle to Staging'
+        pool:
+          vmImage: ubuntu-latest # $(vmPoolImage)        
+        steps:
+
+        - checkout: self
+          persistCredentials: true
+          clean: true
+          displayName: 'Checkout & Build.Reason: $(Build.Reason) & Build.SourceBranchName: $(Build.SourceBranchName)'  
+
+        # Install Databricks CLI (not in venv)
+        - script: |
+            curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh   
+            databricks version
+          displayName: 'Install Databricks CLI and get its version'                           
+            
+        # Deploy bundle to staging
+        - script: |       
+            databricks bundle deploy -t staging
+          displayName: Deploy bundle to test deployment target in staging            

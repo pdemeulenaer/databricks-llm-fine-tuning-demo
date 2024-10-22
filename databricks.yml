@@ -1,0 +1,54 @@
+# The name of the bundle. run `databricks bundle schema` to see the full bundle settings schema.
+bundle:
+  name: databricks_llm_fine_tuning_demo
+
+include:
+  # Resources folder contains ML artifact resources for the ML project that defines model and experiment
+  # And workflows resources for the ML project including model training -> validation -> deployment,
+  # batch inference, data monitoring, metric refresh, alerts and triggering retraining
+  - ./resources/*.yml
+
+# Deployment Target specific values for workspace
+targets:
+
+  # The 'dev' target, for development purposes. This target is the default.
+  dev:
+    # We use 'mode: development' to indicate this is a personal development copy:
+    # - Deployed resources get prefixed with '[dev my_user_name]'
+    # - Any job schedules and triggers are paused by default
+    # - The 'development' mode is used for Delta Live Tables pipelines
+    mode: development
+    default: true
+    workspace:
+      host: https://adb-1400981482943321.1.azuredatabricks.net
+      # root path will be user's own folder 
+
+  # The 'staging' target, used for production-like (testing) deployment.
+  staging:
+    # We use 'mode: production' to indicate this is a production deployment.
+    # Doing so enables strict verification of the settings below.
+    mode: production
+    workspace:
+      host: https://adb-1400981482943321.1.azuredatabricks.net
+      # We always use /Shared/.bundle/staging for all resources to make sure we only have a single copy.
+      # If this path results in an error, please make sure you have a recent version of the CLI installed.
+      root_path: /Shared/.bundle/staging/${bundle.name}
+    run_as:
+      # This runs as philippe.demeulenaer@northell.com in production. We could also use a service principal here,
+      # see https://docs.databricks.com/dev-tools/bundles/permissions.html.
+      user_name: philippe.demeulenaer@northell.com
+
+  # The 'prod' target, used for production deployment.
+  # prod:
+  #   # We use 'mode: production' to indicate this is a production deployment.
+  #   # Doing so enables strict verification of the settings below.
+  #   mode: production
+  #   workspace:
+  #     host: https://adb-1400981482943321.1.azuredatabricks.net
+  #     # We always use /Shared/.bundle/staging for all resources to make sure we only have a single copy.
+  #     # If this path results in an error, please make sure you have a recent version of the CLI installed.
+  #     root_path: /Shared/.bundle/prod/${bundle.name}
+  #   run_as:
+  #     # This runs as philippe.demeulenaer@northell.com in production. We could also use a service principal here,
+  #     # see https://docs.databricks.com/dev-tools/bundles/permissions.html.
+  #     user_name: philippe.demeulenaer@northell.com

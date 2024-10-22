@@ -1,0 +1,46 @@
+
+data_pipeline:
+  data:
+    input_dataset: "b-mc2/sql-create-context"
+    input_dir: "data"
+    output_dir: "data"
+
+tokenizer:
+  tokenizer_id : microsoft/Phi-3.5-mini-instruct
+  config:
+    truncation: True 
+    max_length: 256 
+
+model:
+  base_model_id: "microsoft/Phi-3.5-mini-instruct"   
+
+training:
+  data: 
+    input_dir: "data" 
+  config:    
+    output_dir: "./model_output"
+    report_to: "mlflow"
+    # For the following arguments, refer to https://huggingface.co/docs/transformers/main_classes/trainer
+    per_device_train_batch_size: 2
+    gradient_accumulation_steps: 4
+    gradient_checkpointing: True
+    optim: "paged_adamw_8bit"
+    bf16: True
+    learning_rate: 2e-5
+    lr_scheduler_type: "constant"
+    max_steps: 500
+    warmup_steps: 5
+    # https://discuss.huggingface.co/t/training-llama-with-lora-on-multiple-gpus-may-exist-bug/47005/3
+    ddp_find_unused_parameters: False
+    # num_train_epochs: 1
+    save_strategy: "steps"
+    save_steps: 100
+    logging_strategy: "steps"
+    logging_steps: 100
+    evaluation_strategy: "steps"
+    eval_steps: 100  # evaluating at every step slows down a lot the training!
+  artifacts:
+    output_path: "./mlflow_artifacts"
+  experiment_name : "/Shared/MLflow PEFT Tutorial"
+
+mlflow_location: "databricks" # either "local" or "databricks"

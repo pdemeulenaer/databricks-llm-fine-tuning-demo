@@ -1,0 +1,120 @@
+# The main job for dab_default_python_test.
+resources:
+  jobs:
+
+    data_pipeline_job:
+      name: data_pipeline_job
+
+      permissions:
+        - group_name: users
+          level: CAN_VIEW   
+        - user_name: philippe.demeulenaer@northell.com
+          level: CAN_MANAGE                                  
+
+      # schedule:
+      #   # Run every day at 8:37 AMP
+      #   quartz_cron_expression: '44 37 8 * * ?'
+      #   timezone_id: Europe/Amsterdam
+
+      email_notifications:
+        on_failure:         
+          - philippe.demeulenaer@northell.com
+
+      tasks:        
+        - task_key: data_extraction_task
+          job_cluster_key: data_pipeline_job_cluster
+          python_wheel_task:
+            package_name: databricks_llm_fine_tuning_demo
+            entry_point: data_extraction
+          timeout_seconds: 3600,               
+          libraries:
+            - whl: ../dist/*.whl
+            # - pypi:
+            #     package: pdfminer.six==20240706                  
+
+        - task_key: data_visualization_task
+          depends_on:
+            - task_key: data_extraction_task        
+          job_cluster_key: data_pipeline_job_cluster
+          python_wheel_task:
+            package_name: databricks_llm_fine_tuning_demo
+            entry_point: data_visualization
+          timeout_seconds: 3600,               
+          libraries:
+            - whl: ../dist/*.whl
+            # - pypi:
+            #     package: semantic-text-splitter==0.15.0                         
+                                                                                              
+      job_clusters:    
+        - job_cluster_key: data_pipeline_job_cluster
+          new_cluster:
+            # CPU cluster Pool
+            instance_pool_id: 0906-065954-veld18-pool-kmxexacu # tiny instance
+            # instance_pool_id: 0822-095303-plait752-pool-as5pr5bi # F8 instance
+            spark_version: 15.4.x-cpu-ml-scala2.12    
+            spark_conf: # remove if not needed
+              # spark.databricks.delta.preview.enabled: "true" 
+              spark.master: "local[*, 4]" # Spark working in local mode!
+            autoscale:
+              min_workers: 0
+              max_workers: 0   
+
+
+    ml_pipeline_job:
+      name: ml_pipeline_job
+
+      permissions:
+        - group_name: users
+          level: CAN_VIEW   
+        - user_name: philippe.demeulenaer@northell.com
+          level: CAN_MANAGE                                  
+
+      # schedule:
+      #   # Run every day at 8:37 AMP
+      #   quartz_cron_expression: '44 37 8 * * ?'
+      #   timezone_id: Europe/Amsterdam
+
+      email_notifications:
+        on_failure:         
+          - philippe.demeulenaer@northell.com
+
+      tasks:        
+        - task_key: train_task
+          job_cluster_key: ml_pipeline_job_cluster
+          python_wheel_task:
+            package_name: databricks_llm_fine_tuning_demo
+            entry_point: training
+          timeout_seconds: 3600,               
+          libraries:
+            - whl: ../dist/*.whl
+            # - pypi:
+            #     package: pdfminer.six==20240706                  
+
+        - task_key: evaluation_task
+          depends_on:
+            - task_key: train_task        
+          job_cluster_key: ml_pipeline_job_cluster
+          python_wheel_task:
+            package_name: databricks_llm_fine_tuning_demo
+            entry_point: evaluation
+          timeout_seconds: 3600,              
+          libraries:
+            - whl: ../dist/*.whl
+            # - pypi:
+            #     package: semantic-text-splitter==0.15.0                         
+                                                                                              
+      job_clusters:    
+        - job_cluster_key: ml_pipeline_job_cluster
+          new_cluster:
+            # CPU cluster Pool
+            instance_pool_id: 0906-065954-veld18-pool-kmxexacu # tiny instance
+            # instance_pool_id: 0822-095303-plait752-pool-as5pr5bi # F8 instance
+            spark_version: 15.4.x-cpu-ml-scala2.12  
+            spark_conf: # remove if not needed
+              # spark.databricks.delta.preview.enabled: "true" 
+              spark.master: "local[*, 4]" # Spark working in local mode!                               
+            autoscale:
+              min_workers: 0
+              max_workers: 0             
+
+

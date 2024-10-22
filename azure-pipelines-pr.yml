@@ -1,0 +1,38 @@
+variables:
+  majorVersion: 1
+  minorVersion: 0
+  featureName: 'databricks-llm-fine-tuning-demo-build'
+  addBuildNumberToArtifactZip: true
+  condaEnvName: 'databricks-llm-fine-tuning-demo'
+
+name: $(majorVersion).$(minorVersion)$(Rev:.r)
+
+trigger: none
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- checkout: self
+  clean: true
+  persistCredentials: true
+
+- bash: echo "##vso[task.prependpath]$CONDA/bin"
+  displayName: Add conda to PATH
+
+- script: |
+    echo $(Build.BuildNumber) > build_version.txt
+  displayName: Create build version txt
+
+- script: |
+    conda init bash
+
+- script: |
+    conda env create --file environment.yml
+    source /usr/share/miniconda/etc/profile.d/conda.sh
+    conda activate $(condaEnvName)
+    python -m pip install --upgrade pip
+    pip install -r requirements.txt
+    pip install -e .
+    make quality-ci
+  displayName: 'Install dependencies & check quality'
