@@ -34,7 +34,7 @@ def main():
     print(package_dir)
 
     # Read the yaml configuration file
-    config_file_path = os.path.join(package_dir, "llm_fine_tuning/config.yaml")
+    config_file_path = os.path.join(package_dir, "config.yaml")
     parameters = load_parameters(config_file_path)
     print(parameters)
 
@@ -43,12 +43,13 @@ def main():
         data_dir = "/Volumes/responseosdev_catalog/volumes/databricks_llm_fine_tuning_demo_volume"
     else:
         # else read input data from package
-        data_dir = os.path.join(package_dir,"llm_fine_tuning")
+        # data_dir = os.path.join(package_dir,"llm_fine_tuning")
+        data_dir = package_dir
 
     # 2. Dataset Preparation
 
     # Load Dataset from HuggingFace Hub
-    dataset_name = parameters["data_pipeline"]["data"]["input_dataset"] #"b-mc2/sql-create-context"
+    dataset_name = parameters["data_pipeline"]["data"]["input_dataset"]  # "b-mc2/sql-create-context"
     dataset = load_dataset(dataset_name, split="train")
     display_table(dataset.select(range(3)))
 

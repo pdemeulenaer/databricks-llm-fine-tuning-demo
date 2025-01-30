@@ -42,12 +42,12 @@ quality-ci: lint test
 # 1.1 Local commands to run the DATA pipeline
 
 data-extraction:
-	python -m src.databricks_llm_fine_tuning_demo.data_pipeline.task1
+	python -m src.databricks_llm_fine_tuning_demo.data_pipeline.data_loader
 
-data-visualization:
-	python -m src.databricks_llm_fine_tuning_demo.data_pipeline.task2
+# data-visualization:
+# 	python -m src.databricks_llm_fine_tuning_demo.data_pipeline.task2
 
-run-data-pipeline: data-extraction data-visualization	
+run-data-pipeline: data-extraction # data-visualization	
 
 # 1.2 Local commands to run the ML pipeline
 
