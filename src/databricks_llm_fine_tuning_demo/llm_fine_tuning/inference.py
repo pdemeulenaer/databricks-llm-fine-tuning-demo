@@ -39,7 +39,7 @@ def main():
         data_dir = "/Volumes/responseosdev_catalog/volumes/databricks_llm_fine_tuning_demo_volume"
     else:
         # else read input data from package
-        data_dir = os.path.join(package_dir, "llm_fine_tuning")
+        data_dir = os.path.join(package_dir,"llm_fine_tuning")
 
     # # Load the train and test data from CSV files
     # input_dir = os.path.join(data_dir, parameters["data_pipeline"]["data"]["input_dir"])
