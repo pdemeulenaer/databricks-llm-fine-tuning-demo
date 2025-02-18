@@ -40,7 +40,7 @@ def main():
     print(package_dir)
 
     # Read the yaml configuration file
-    config_file_path = os.path.join(package_dir, "config.yaml")
+    config_file_path = os.path.join(package_dir, "llm_fine_tuning/config.yaml")
     parameters = load_parameters(config_file_path)
     print(parameters)
 
@@ -49,8 +49,7 @@ def main():
         data_dir = "/Volumes/responseosdev_catalog/volumes/databricks_llm_fine_tuning_demo_volume"
     else:
         # else read input data from package
-        # data_dir = os.path.join(package_dir,"llm_fine_tuning")
-        data_dir = package_dir
+        data_dir = os.path.join(package_dir,"llm_fine_tuning")
 
     # 2. Dataset preparation
 
@@ -93,8 +92,8 @@ def main():
     display_table(train_dataset.select(range(1)))
 
     # Padding the Training Dataset
-
-    tokenizer_id = parameters["tokenizer"]["tokenizer_id"]
+    
+    tokenizer_id = parameters["tokenizer"]["tokenizer_id"] 
     # You can use a different max length if your custom dataset has shorter/longer input sequences.
     MAX_LENGTH = parameters["tokenizer"]["config"]["max_length"]
     truncation = parameters["tokenizer"]["config"]["truncation"]
@@ -139,10 +138,8 @@ def main():
         bnb_4bit_compute_dtype=torch.bfloat16,
     )
 
-    base_model_id = parameters["model"][
-        "base_model_id"
-    ]  # "microsoft/Phi-3.5-mini-instruct"  # "mistralai/Mistral-7B-v0.1"
-
+    base_model_id = parameters["model"]["base_model_id"] # "microsoft/Phi-3.5-mini-instruct"  # "mistralai/Mistral-7B-v0.1"
+    
     model = AutoModelForCausalLM.from_pretrained(
         base_model_id,
         quantization_config=quantization_config,
@@ -200,12 +197,12 @@ def main():
 
     # Comment-out this line if you are running the tutorial on Databricks
     mlflow.set_tracking_uri("databricks")
-    experiment_name = parameters["training"]["experiment_name"]  # f"/Shared/MLflow PEFT Tutorial"
+    experiment_name = parameters["training"]["experiment_name"] # f"/Shared/MLflow PEFT Tutorial"
     mlflow.set_experiment(experiment_name)
     # experiment_name = f"/Shared/{experiment_name}"
 
     # Extract the 'config' section from the YAML
-    config_dict = parameters["training"]["config"]
+    config_dict = parameters['training']['config']
 
     # Define additional training parameters
     additional_params = {
@@ -214,7 +211,7 @@ def main():
 
     # Combine YAML config with additional parameters
     # Additional parameters will override YAML config if there are duplicates
-    combined_config = {**config_dict, **additional_params}
+    combined_config = {**config_dict, **additional_params}    
 
     # training_args = TrainingArguments(**combined_config)
 

@@ -1,18 +1,22 @@
 
 data_pipeline:
   data:
-    input_dataset: "b-mc2/sql-create-context"
+    input_dataset: "math-ai/TemplateGSM" #"b-mc2/sql-create-context"
     input_dir: "data"
     output_dir: "data"
 
 tokenizer:
-  tokenizer_id : microsoft/Phi-3.5-mini-instruct
+  # tokenizer_id : "microsoft/Phi-3.5-mini-instruct"
+  # tokenizer_id : "meta-llama/Llama-3.2-1B-Instruct"
+  tokenizer_id : "Qwen/Qwen2.5-0.5B-Instruct" 
   config:
     truncation: True 
     max_length: 256 
 
 model:
-  base_model_id: "microsoft/Phi-3.5-mini-instruct"   
+  # base_model_id: "microsoft/Phi-3.5-mini-instruct"  
+  # base_model_id: "meta-llama/Llama-3.2-1B-Instruct" 
+  base_model_id: "Qwen/Qwen2.5-0.5B-Instruct"   
 
 training:
   data: 
