@@ -2,6 +2,13 @@
 bundle:
   name: databricks_llm_fine_tuning_demo
 
+# This block is only necessary if the bundle makes use of Poetry for Python package management.
+artifacts:
+  default:
+    type: whl
+    build: poetry build
+    path: .     
+
 include:
   # Resources folder contains ML artifact resources for the ML project that defines model and experiment
   # And workflows resources for the ML project including model training -> validation -> deployment,
@@ -20,7 +27,7 @@ targets:
     mode: development
     default: true
     workspace:
-      host: https://adb-1400981482943321.1.azuredatabricks.net
+      host: https://adb-1653927558340334.14.azuredatabricks.net/
       # root path will be user's own folder 
 
   # The 'staging' target, used for production-like (testing) deployment.
@@ -29,14 +36,14 @@ targets:
     # Doing so enables strict verification of the settings below.
     mode: production
     workspace:
-      host: https://adb-1400981482943321.1.azuredatabricks.net
+      host: https://adb-1653927558340334.14.azuredatabricks.net/
       # We always use /Shared/.bundle/staging for all resources to make sure we only have a single copy.
       # If this path results in an error, please make sure you have a recent version of the CLI installed.
       root_path: /Shared/.bundle/staging/${bundle.name}
     run_as:
-      # This runs as philippe.demeulenaer@northell.com in production. We could also use a service principal here,
+      # This runs as pdemeulenaer@gmail.com in production. We could also use a service principal here,
       # see https://docs.databricks.com/dev-tools/bundles/permissions.html.
-      user_name: philippe.demeulenaer@northell.com
+      user_name: pdemeulenaer@gmail.com
 
   # The 'prod' target, used for production deployment.
   # prod:
@@ -44,11 +51,11 @@ targets:
   #   # Doing so enables strict verification of the settings below.
   #   mode: production
   #   workspace:
-  #     host: https://adb-1400981482943321.1.azuredatabricks.net
+  #     host: https://adb-1653927558340334.14.azuredatabricks.net/
   #     # We always use /Shared/.bundle/staging for all resources to make sure we only have a single copy.
   #     # If this path results in an error, please make sure you have a recent version of the CLI installed.
   #     root_path: /Shared/.bundle/prod/${bundle.name}
   #   run_as:
-  #     # This runs as philippe.demeulenaer@northell.com in production. We could also use a service principal here,
+  #     # This runs as pdemeulenaer@gmail.com in production. We could also use a service principal here,
   #     # see https://docs.databricks.com/dev-tools/bundles/permissions.html.
-  #     user_name: philippe.demeulenaer@northell.com
+  #     user_name: pdemeulenaer@gmail.com
