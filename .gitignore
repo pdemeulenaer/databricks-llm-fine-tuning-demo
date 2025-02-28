@@ -144,6 +144,9 @@ cython_debug/
 # PyTorch 
 *.pt 
 *.pth
+*.safetensors
+*.bin
+/peft-dialogue-summary-training
 
 # Databricks
 .databricks

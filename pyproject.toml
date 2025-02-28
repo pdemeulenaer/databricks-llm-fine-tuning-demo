@@ -17,6 +17,7 @@ readme = "README.md"
 requires-python = ">=3.11,<4.0"
 dependencies = [
     "accelerate == 1.3.0",
+    "bitsandbytes==0.43.3",
     "scipy == 1.13.1",
     "datasets",
     "transformers == 4.48.2",
@@ -36,6 +37,8 @@ dependencies = [
     "evaluate == 0.4.3",
     "pynvml == 12.0.0",
     "rouge_score == 0.1.2",
+    "jupyter (>=1.1.1,<2.0.0)",
+    "ipykernel (>=6.29.5,<7.0.0)",
 ]
 
 [build-system]
