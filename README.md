@@ -9,7 +9,7 @@ This template must be used as part of a new or existing GIT repository.
 You need to have conda installed:
 https://www.anaconda.com/download/
 
-You also need to have the Databricks CLI installed. For that, follow instructions in bullet 1 of [this documentation](https://dev.azure.com/northell/Northell/_wiki/wikis/Northell.wiki/19/Anything-Databricks?anchor=1.-install-databricks-cli-and-connect-laptop-to-dbx-workspace)
+You also need to have the Databricks CLI installed. 
 
 ## Using make
 If conda has been successfully installed, project can be set up using make

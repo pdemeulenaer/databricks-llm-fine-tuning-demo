@@ -2,8 +2,8 @@ site_name: databricks-llm-fine-tuning-demo
 docs_dir: . # this, in combination with plugin '- same-dir', makes root folder as reference folder
 
 # Copyright
-copyright: Copyright &copy; 2004 - 2024 Northell Partners Ltd
-site_author: Peter Verster
+# copyright: Copyright &copy; 2004 - 2024 Partners Ltd
+site_author: Philippe de Meulenaer
 
 
 nav:
